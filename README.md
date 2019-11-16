@@ -8,12 +8,12 @@ Chipset | Qualcomm Snapdragon 660, SDM660
 GPU     | Adreno 512
 ROM     | 32/64/128GB
 RAM     | 3/4/6GB
-Android | 8.1.0
+Android | 8.1.0 / 9.0
 
 Note:
 Depends on: android_packages_resources_devicesettings from LineageOS
 
-Currently Supported Devices: wayne (MI 6X), jasmine_sprout (MI A2) and clover (MI PAD 4 /4 Plus)
+Currently Supported Devices: wayne (MI 6X), jasmine_sprout (MI A2), clover (MI PAD 4 /4 Plus) and lavender (Redmi Note 7/7S)
 
 ## Copyright
 
