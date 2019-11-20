@@ -172,9 +172,9 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.com.google.clientidbase.ms=android-xiaomi-rev2
 
 # HAL1 apps list
-PRODUCT_PROPERTY_OVERRIDES += \
-    camera.hal1.packagelist=com.android.camera,com.android.camera2 \
-    vendor.camera.hal1.packagelist=com.android.camera,com.android.camera2
+#PRODUCT_PROPERTY_OVERRIDES += \
+#    camera.hal1.packagelist=com.android.camera,com.android.camera2 \
+#    vendor.camera.hal1.packagelist=com.android.camera,com.android.camera2
 
 # IMS
 PRODUCT_PROPERTY_OVERRIDES += \
