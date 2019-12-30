@@ -510,3 +510,9 @@ PRODUCT_BOOT_JARS += \
 # XiaomiParts
 PRODUCT_PACKAGES += \
    XiaomiParts
+
+#FM
+PRODUCT_PACKAGES += \
+    FM2 \
+    libqcomfm_jni \
+    qcom.fmradio
