@@ -27,10 +27,9 @@ PRODUCT_PROPERTY_OVERRIDES += \
     persist.vendor.audio.hifi.int_codec=true \
     persist.vendor.audio.hw.binder.size_kbyte=1024 \
     persist.vendor.audio.ras.enabled=false \
-    persist.vendor.bt.a2dp_offload_cap=sbc-aac \
     ro.af.client_heap_size_kbyte=7168 \
     ro.audio.soundfx.dirac=true \
-    ro.config.vc_call_vol_steps=14 \
+    ro.config.vc_call_vol_steps=7 \
     ro.config.media_vol_steps=25 \
     ro.vendor.audio.sdk.fluencetype=fluence \
     ro.vendor.audio.sdk.ssr=false \
@@ -77,11 +76,11 @@ PRODUCT_PROPERTY_OVERRIDES += \
     vendor.audio.feature.external_dsp.enable=false \
     vendor.audio.feature.external_speaker.enable=false \
     vendor.audio.feature.external_speaker_tfa.enable=false \
-    vendor.audio.feature.fluence.enable=true \
+    vendor.audio.feature.fluence.enable=false \
     vendor.audio.feature.fm.enable=true \
-    vendor.audio.feature.hdmi_edid.enable=true \
+    vendor.audio.feature.hdmi_edid.enable=false \
     vendor.audio.feature.hdmi_passthrough.enable=false \
-    vendor.audio.feature.hfp.enable=true \
+    vendor.audio.feature.hfp.enable=false \
     vendor.audio.feature.hifi_audio.enable=true \
     vendor.audio.feature.hwdep_cal.enable=false \
     vendor.audio.feature.incall_music.enable=false \
@@ -92,8 +91,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
     vendor.audio.feature.ras.enable=false \
     vendor.audio.feature.record_play_concurency.enable=false \
     vendor.audio.feature.src_trkn.enable=true \
-    vendor.audio.feature.spkr_prot.enable=true \
-    vendor.audio.feature.ssrec.enable=true \
+    vendor.audio.feature.spkr_prot.enable=false \
+    vendor.audio.feature.ssrec.enable=false \
     vendor.audio.feature.usb_offload.enable=false \
     vendor.audio.feature.usb_offload_burst_mode.enable=false \
     vendor.audio.feature.usb_offload_sidetone_volume.enable=false \
@@ -101,24 +100,24 @@ PRODUCT_PROPERTY_OVERRIDES += \
     vendor.audio.feature.vbat.enable=true \
     vendor.audio.feature.wsa.enable=true \
     vendor.audio.feature.audiozoom.enable=false \
-    vendor.audio.feature.snd_mon.enable=true
+    vendor.audio.feature.snd_mon.enable=false
 
 # Bluetooth
 PRODUCT_PROPERTY_OVERRIDES += \
     vendor.qcom.bluetooth.soc=cherokee \
-    persist.bluetooth.bluetooth_audio_hal.disabled=true \
+    persist.bluetooth.bluetooth_audio_hal.disabled=false \
     ro.vendor.bluetooth.wipower=false \
     persist.bluetooth.a2dp_offload.disabled=false \
-    persist.bluetooth.a2dp_offload.cap=sbc-aac-aptx-aptxhd-ldac \
+		persist.vendor.qcom.bluetooth.enable.splita2dp=false \
+    persist.vendor.bt.a2dp_offload_cap=sbc-aac-aptx-aptxhd-ldac \
     persist.vendor.bt.aac_frm_ctl.enabled=true
 
 # Camera
 PRODUCT_PROPERTY_OVERRIDES += \
-    camera.aux.packagelist=org.codeaurora.snapcam,com.android.camera,com.qualcomm.qti.qmmi \
     persist.vendor.camera.HAL3.enabled=1 \
     persist.vendor.camera.eis.enable=1 \
     persist.vendor.camera.exif.make=Xiaomi \
-    vendor.camera.aux.packagelist=org.codeaurora.snapcam,com.android.camera,com.qualcomm.qti.qmmi \
+    vendor.camera.aux.packageblacklist=com.google.android.GoogleCamera,com.discord \
     persist.vendor.camera.privapp.list=org.codeaurora.snapcam \
     persist.camera.privapp.list=org.codeaurora.snapcam
 
@@ -158,6 +157,14 @@ PRODUCT_PROPERTY_OVERRIDES += \
     video.disable.ubwc=1 \
     vendor.display.enable_default_color_mode=0
 
+# The default sf phase offset is set to 6ms, to avoid it be included into next
+# vsync threshold, set high fps early sf and next vsync threshold phase offset
+# to 6.1ms, which is bigger than all sf phase offsets in normal frame rate.
+PRODUCT_PROPERTY_OVERRIDES += \
+    debug.sf.high_fps_early_phase_offset_ns=6100000 \
+    debug.sf.high_fps_early_gl_phase_offset_ns=9000000 \
+    debug.sf.phase_offset_threshold_for_next_vsync_ns=6100000
+
 # enable FIFO scheduling for UI and Render threads by default
 PRODUCT_PROPERTY_OVERRIDES += \
     sys.use_fifo_ui=1
@@ -172,9 +179,9 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.com.google.clientidbase.ms=android-xiaomi-rev2
 
 # HAL1 apps list
-#PRODUCT_PROPERTY_OVERRIDES += \
-#    camera.hal1.packagelist=com.android.camera,com.android.camera2 \
-#    vendor.camera.hal1.packagelist=com.android.camera,com.android.camera2
+PRODUCT_PROPERTY_OVERRIDES += \
+    camera.hal1.packagelist=com.android.camera,com.android.camera2 \
+    vendor.camera.hal1.packagelist=com.android.camera,com.android.camera2
 
 # IMS
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -198,7 +205,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     mmp.enable.3g2=true \
     persist.mm.enable.prefetch=true \
     vendor.vidc.dec.enable.downscalar=1 \
-    vendor.vidc.enc.disable.pq=false \
+    vendor.vidc.enc.disable.pq=true \
     vendor.vidc.enc.disable_bframes=1 \
     vidc.enc.dcvs.extra-buff-count=2 \
     vidc.enc.target_support_bframe=1
