@@ -54,12 +54,6 @@
 # Shell Script
 /(vendor|system/vendor)/bin/init\.goodix\.sh    u:object_r:init_fingerprint_exec:s0
 
-# Tap to Wake
-/sys/devices/soc/c177000.i2c/i2c-3/3-005d/enable_dt2w u:object_r:sysfs_tap_to_wake:s0
-/sys/devices/soc/c177000.i2c/i2c-3/3-0038/enable_dt2w u:object_r:sysfs_tap_to_wake:s0
-/proc/touchscreen/enable_dt2w u:object_r:sysfs_tap_to_wake:s0
-/sys/devices/soc/c175000\.i2c/i2c-1/1-[0-9a-f]+/input/input[0-9]+/wake_gesture u:object_r:sysfs_tap_to_wake:s0
-
 # Thermal
 /data/vendor/thermal(/.*)?                      u:object_r:thermal_data_file:s0
 
@@ -68,3 +62,6 @@
 
 # USB
 /(vendor|system/vendor)/bin/hw/android\.hardware\.usb@1\.0-service\.xiaomi_sdm660       u:object_r:hal_usb_default_exec:s0
+
+# Service HALs
+/(vendor|system/vendor)/bin/hw/android\.hardware\.authsecret@1\.0-service u:object_r:hal_authsecret_default_exec:s0
