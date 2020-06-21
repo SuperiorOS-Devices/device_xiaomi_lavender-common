@@ -19,6 +19,7 @@ package org.lineageos.settings.device;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.SELinux;
 import androidx.preference.PreferenceFragment;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
@@ -26,6 +27,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreference;
+import android.util.Log;
 
 
 import org.lineageos.settings.device.kcal.KCalSettingsActivity;
@@ -34,12 +36,15 @@ import org.lineageos.settings.device.preferences.SecureSettingSwitchPreference;
 import org.lineageos.settings.device.preferences.VibrationSeekBarPreference;
 import org.lineageos.settings.device.preferences.NotificationLedSeekBarPreference;
 import org.lineageos.settings.device.preferences.CustomSeekBarPreference;
+import org.lineageos.settings.device.SuShell;
+import org.lineageos.settings.device.SuTask;
 
 import java.lang.Math.*;
 
 public class DeviceSettings extends PreferenceFragment implements
         Preference.OnPreferenceChangeListener {
-
+        
+    private static final String TAG = "XiaomiParts";
     public static final String CATEGORY_VIBRATOR = "vibration";
     public static final String PREF_VIBRATION_STRENGTH = "vibration_strength";
     public static final String VIBRATION_STRENGTH_PATH = "/sys/devices/virtual/timed_output/vibrator/vtg_level";
@@ -79,6 +84,10 @@ public class DeviceSettings extends PreferenceFragment implements
     public static final String PREF_HALL_WAKEUP = "hall";
     public static final String HALL_WAKEUP_PATH = "/sys/module/hall/parameters/hall_toggle";
     public static final String HALL_WAKEUP_PROP = "persist.service.folio_daemon";
+    
+    private static final String SELINUX_CATEGORY = "selinux";
+    private static final String PREF_SELINUX_MODE = "selinux_mode";
+    private static final String PREF_SELINUX_PERSISTENCE = "selinux_persistence";
 
     private static final String DEVICE_DOZE_PACKAGE_NAME = "org.lineageos.settings.doze";
 
@@ -88,6 +97,8 @@ public class DeviceSettings extends PreferenceFragment implements
     private SecureSettingListPreference mTHERMAL;
 
     private static Context mContext;
+    private SwitchPreference mSelinuxMode;
+    private SwitchPreference mSelinuxPersistence;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -139,6 +150,19 @@ public class DeviceSettings extends PreferenceFragment implements
         fpsInfo.setChecked(prefs.getBoolean(PREF_KEY_FPS_INFO, false));
         fpsInfo.setOnPreferenceChangeListener(this);
 
+        // SELinux
+        Preference selinuxCategory = findPreference(SELINUX_CATEGORY);
+        mSelinuxMode = (SwitchPreference) findPreference(PREF_SELINUX_MODE);
+        mSelinuxMode.setChecked(SELinux.isSELinuxEnforced());
+        mSelinuxMode.setOnPreferenceChangeListener(this);
+
+        mSelinuxPersistence =
+        (SwitchPreference) findPreference(PREF_SELINUX_PERSISTENCE);
+        mSelinuxPersistence.setOnPreferenceChangeListener(this);
+        mSelinuxPersistence.setChecked(getContext()
+        .getSharedPreferences("selinux_pref", Context.MODE_PRIVATE)
+        .contains(PREF_SELINUX_MODE));
+        
         Preference kcal = findPreference(PREF_DEVICE_KCAL);
 
         kcal.setOnPreferenceClickListener(preference -> {
@@ -238,7 +262,19 @@ public class DeviceSettings extends PreferenceFragment implements
                     DiracService.sDiracUtils.setLevel(String.valueOf(value));
                 }
                 break;
-
+            
+            case PREF_SELINUX_MODE:
+                  if (preference == mSelinuxMode) {
+                  boolean enabled = (Boolean) value;
+                  new SwitchSelinuxTask(getActivity()).execute(enabled);
+                  setSelinuxEnabled(enabled, mSelinuxPersistence.isChecked());
+                  return true;
+                } else if (preference == mSelinuxPersistence) {
+                  setSelinuxEnabled(mSelinuxMode.isChecked(), (Boolean) value);
+                  return true;
+                }
+                break;
+                
             case PREF_HALL_WAKEUP:
                 FileUtils.setValue(HALL_WAKEUP_PATH, (boolean) value ? "Y" : "N");
                 FileUtils.setProp(HALL_WAKEUP_PROP, (boolean) value);
@@ -260,6 +296,44 @@ public class DeviceSettings extends PreferenceFragment implements
         return true;
     }
 
+    private void setSelinuxEnabled(boolean status, boolean persistent) {
+          SharedPreferences.Editor editor = getContext()
+              .getSharedPreferences("selinux_pref", Context.MODE_PRIVATE).edit();
+          if (persistent) {
+            editor.putBoolean(PREF_SELINUX_MODE, status);
+          } else {
+            editor.remove(PREF_SELINUX_MODE);
+          }
+          editor.apply();
+          mSelinuxMode.setChecked(status);
+        }
+
+        private class SwitchSelinuxTask extends SuTask<Boolean> {
+          public SwitchSelinuxTask(Context context) {
+            super(context);
+          }
+          @Override
+          protected void sudoInBackground(Boolean... params) throws SuShell.SuDeniedException {
+            if (params.length != 1) {
+              Log.e(TAG, "SwitchSelinuxTask: invalid params count");
+              return;
+            }
+            if (params[0]) {
+              SuShell.runWithSuCheck("setenforce 1");
+            } else {
+              SuShell.runWithSuCheck("setenforce 0");
+            }
+          }
+
+          @Override
+          protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            if (!result) {
+              // Did not work, so restore actual value
+              setSelinuxEnabled(SELinux.isSELinuxEnforced(), mSelinuxPersistence.isChecked());
+            }
+          }
+        }
     private boolean isAppNotInstalled(String uri) {
         PackageManager packageManager = getContext().getPackageManager();
         try {
