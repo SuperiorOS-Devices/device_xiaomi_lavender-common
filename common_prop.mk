@@ -150,6 +150,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     debug.sf.early_phase_offset_ns=1500000 \
     debug.sf.enable_gl_backpressure=1 \
     debug.cpurend.vsync=false \
+    debug.sdm.support_writeback=0 \
     debug.hwui.use_buffer_age=false \
     persist.debug.wfd.enable=1 \
     persist.hwc.enable_vds=1 \
