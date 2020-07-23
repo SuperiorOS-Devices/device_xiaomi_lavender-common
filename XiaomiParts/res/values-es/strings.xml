@@ -21,7 +21,7 @@
 
     <!-- Mi Note 3 Settings -->
     <string name="jason_pref_title">Ajustes del dispositivo</string>
-    <string name="jason_pref_summary">Ajustes adicionales de Mi Note 3</string>
+    <string name="jason_pref_summary">Ajustes adicionales de Redmi Note 7</string>
      
     <!-- KCal -->
     <string name="device_kcal_title">Calibrar Color de Pantalla </string>
