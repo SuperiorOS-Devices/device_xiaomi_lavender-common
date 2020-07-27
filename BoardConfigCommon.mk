@@ -22,6 +22,7 @@
 # definition file).
 #
 
+SELINUX_IGNORE_NEVERALLOWS := true
 
 # Common Tree Path
 COMMON_PATH := device/xiaomi/sdm660-common
